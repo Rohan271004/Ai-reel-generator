@@ -6,3 +6,4 @@ python-dotenv==1.2.2
 requests==2.34.0
 pillow==12.2.0
 whitenoise==6.6.0
+google-generativeai

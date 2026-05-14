@@ -13,6 +13,8 @@ def home(request):
 def generate_script(request):
     if request.method == "POST":
         try:
+            print("REQUEST RECEIVED")
+
             data = json.loads(request.body)
 
             topic = data.get("topic")
@@ -20,24 +22,28 @@ def generate_script(request):
             platform = data.get("platform")
             style = data.get("style")
 
+            print(topic, niche, platform, style)
+
             result = generate_reel_script(topic, niche, platform, style)
 
-            # save to DB
+            print("AI RESULT:", result)
+
             ReelScript.objects.create(
                 topic=topic,
                 niche=niche,
                 platform=platform,
                 style=style,
-                title=result["title"],
-                hook=result["hook"],
-                script=result["script"],
-                cta=result["cta"],
-                hashtags=result["hashtags"],
+                title=result.get("title", ""),
+                hook=result.get("hook", ""),
+                script=result.get("script", ""),
+                cta=result.get("cta", ""),
+                hashtags=result.get("hashtags", ""),
             )
 
             return JsonResponse(result)
 
         except Exception as e:
+            print("ERROR:", str(e))
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"message": "Only POST allowed"})

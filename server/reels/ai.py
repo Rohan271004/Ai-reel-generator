@@ -1,11 +1,13 @@
 import os
 import json
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 
 def fallback_response(topic, niche, platform, style):
@@ -28,6 +30,7 @@ Start strong, keep energy high, and deliver value.
 
 def generate_reel_script(topic, niche, platform, style):
     try:
+
         prompt = f"""
 Create a viral reel script.
 
@@ -46,9 +49,7 @@ Return ONLY valid JSON:
 }}
 """
 
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=prompt
-        )
+        response = model.generate_content(prompt)
 
         text = response.text.strip()
 
@@ -57,5 +58,6 @@ Return ONLY valid JSON:
         return json.loads(text)
 
     except Exception as e:
-        # 🔥 IMPORTANT: fallback if quota/API fails
+        print("AI ERROR:", str(e))
+
         return fallback_response(topic, niche, platform, style)

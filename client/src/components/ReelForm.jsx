@@ -10,6 +10,7 @@ function ReelForm() {
     });
 
     const [result, setResult] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -20,17 +21,23 @@ function ReelForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        console.log("BUTTON CLICKED");
         try {
+            setLoading(true);
+
             const response = await API.post("generate/", formData);
 
-            // ✅ IMPORTANT FIX: store only result object
-            setResult(response.data);
+            // safer handling
+            const data = response.data.result || response.data;
+
+            setResult(data);
 
             console.log("API Response:", response.data);
 
         } catch (error) {
             console.log("Error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -87,9 +94,10 @@ function ReelForm() {
 
                 <button
                     type="submit"
+                    disabled={loading}
                     className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition"
                 >
-                    Generate Script
+                    {loading ? "Generating..." : "Generate Script"}
                 </button>
             </form>
 
